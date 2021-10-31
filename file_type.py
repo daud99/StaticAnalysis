@@ -2,10 +2,10 @@
 import os
 import csv
 import magic
-
-def determineFileType(file=None, display=False, csv_file=None):
+import hash_malware
+def performFileAnalysis(file=None, display=False, csv_file=None, hashes=False):
     '''
-    detemineFileType given the file path
+    performFileAnalysis given the file path
     :param file: The path of the file
     :type file: string
     :param display: To enable or disable printing the file type on terminal/shell
@@ -14,6 +14,10 @@ def determineFileType(file=None, display=False, csv_file=None):
     :type csv: string
     '''
 
+    header = ["File Name", "File Type using from_file", "File Type using from_buffer", "File Type using from_file with MIME"]
+
+    if hashes: header.extend(["md5", "sha1", "sha256"])
+    hashes_list = []
     if file == None:
         return
     try:
@@ -22,12 +26,13 @@ def determineFileType(file=None, display=False, csv_file=None):
         file_type_3 = magic.from_buffer(open(file.path, 'rb').read(2048), mime=True)
         if display: printFileTypeInfo(file, file_type_1, file_type_2, file_type_3)
         append_header = True
+        if hashes: hashes_list = hash_malware.computeHashes(file.path)
         if(os.path.exists(csv_file)): append_header = False
         if csv_file:
             with open(csv_file,  'a', newline='') as f:
                 writer = csv.writer(f)
-                if append_header: writer.writerow(["File Name", "File Type using from_file", "File Type using from_buffer", "File Type using from_file with MIME"])
-                writer.writerow([file.name, file_type_1, file_type_2, file_type_3])
+                if append_header: writer.writerow(header)
+                writer.writerow([file.name, file_type_1, file_type_2, file_type_3, *hashes_list])
 
     except Exception as e:
         print("Error detemining file type")

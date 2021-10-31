@@ -2,7 +2,7 @@
 from datetime import datetime
 import os
 
-from file_type import determineFileType
+from file_type import performFileAnalysis
 
 class FileExtractor():
     '''
@@ -32,5 +32,5 @@ if "__main__" == __name__:
     file_extractor = FileExtractor(folder_path)
     files = file_extractor.getFiles()
     for each in files:
-        determineFileType(each, True, csv_file)
+        performFileAnalysis(each, True, csv_file, True)
 

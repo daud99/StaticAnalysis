@@ -2,3 +2,4 @@ venv/*
 filetype-*
 __pycache__/*
 .idea/*
+strings-*

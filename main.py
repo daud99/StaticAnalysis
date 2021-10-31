@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 
 from file_type import performFileAnalysis
+import strings
 
 class FileExtractor():
     '''
@@ -33,4 +34,6 @@ if "__main__" == __name__:
     files = file_extractor.getFiles()
     for each in files:
         performFileAnalysis(each, True, csv_file, True)
+        strings.findStrings(each)
+
 

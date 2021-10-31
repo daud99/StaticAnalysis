@@ -3,7 +3,7 @@ import os
 import csv
 import magic
 import hash_malware
-def performFileAnalysis(file=None, display=False, csv_file=None, hashes=False):
+def performFileAnalysis(file=None, display=False, csv_file=None):
     '''
     performFileAnalysis given the file path
     :param file: The path of the file
@@ -13,7 +13,7 @@ def performFileAnalysis(file=None, display=False, csv_file=None, hashes=False):
     :param csv: To enable or disable exporting file types in CSV format in case you want to export csv just pass in the name of the file
     :type csv: string
     '''
-
+    hashes = True
     header = ["File Name", "File Type using from_file", "File Type using from_buffer", "File Type using from_file with MIME"]
 
     if hashes: header.extend(["md5", "sha1", "sha256"])
@@ -27,7 +27,7 @@ def performFileAnalysis(file=None, display=False, csv_file=None, hashes=False):
         if display: printFileTypeInfo(file, file_type_1, file_type_2, file_type_3)
         append_header = True
         if hashes: hashes_list = hash_malware.computeHashes(file.path)
-        if(os.path.exists(csv_file)): append_header = False
+        if(csv_file and os.path.exists(csv_file)): append_header = False
         if csv_file:
             with open(csv_file,  'a', newline='') as f:
                 writer = csv.writer(f)

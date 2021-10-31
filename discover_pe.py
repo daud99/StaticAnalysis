@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-
+import os
 import pefile
 import sys
 # pe = pefile.PE(sys.argv[1])
 
 #check if valid MS Dos header
-def discoverPE(file):
+def discoverPE(file, directory=''):
     file_name = f'pediscover-{file.name}.txt'
+    if directory: file_name = os.path.join(directory, file_name)
     pe = pefile.PE(file.path)
     with open(file_name, 'w') as f:
 

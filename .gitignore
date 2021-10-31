@@ -3,3 +3,4 @@ filetype-*
 __pycache__/*
 .idea/*
 strings-*
+pediscover-*

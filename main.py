@@ -4,6 +4,7 @@ import os
 
 from file_type import performFileAnalysis
 import strings
+import discover_pe
 
 class FileExtractor():
     '''
@@ -35,5 +36,6 @@ if "__main__" == __name__:
     for each in files:
         performFileAnalysis(each, True, csv_file, True)
         strings.findStrings(each)
+        discover_pe.discoverPE(each)
 
 

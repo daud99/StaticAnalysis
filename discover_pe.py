@@ -1,108 +1,111 @@
+#!/usr/bin/env python
 
 import pefile
 import sys
-pe = pefile.PE(sys.argv[1])
-
+# pe = pefile.PE(sys.argv[1])
 
 #check if valid MS Dos header
+def discoverPE(file):
+    file_name = f'pediscover-{file.name}.txt'
+    pe = pefile.PE(file.path)
+    with open(file_name, 'w') as f:
 
-if pe.DOS_HEADER.e_magic == 0x5a4d:
-    FILE_HEADER = pe.NT_HEADERS.FILE_HEADER
-    OPTIONAL_HEADER = pe.NT_HEADERS.OPTIONAL_HEADER
-    # FILE_HEADER
-    Machine = FILE_HEADER.Machine
-    NumberOfSections = FILE_HEADER.NumberOfSections
-    Characteristics  = FILE_HEADER.Characteristics
-    print('**************** FILE_HEADER BEGINS ******************')
-    if Machine in pefile.MACHINE_TYPE: print('MACHINE_TYPE: ',pefile.MACHINE_TYPE[Machine])
-    print('NumberOfSections ', hex (NumberOfSections))
-    print('Characteristics: ', hex(Characteristics))
-    if FILE_HEADER.IMAGE_FILE_16BIT_MACHINE: print('    IMAGE_FILE_16BIT_MACHINE')            
-    if FILE_HEADER.IMAGE_FILE_32BIT_MACHINE: print('    IMAGE_FILE_32BIT_MACHINE')
-    if FILE_HEADER.IMAGE_FILE_AGGRESIVE_WS_TRIM: print('    IMAGE_FILE_AGGRESIVE_WS_TRIM' )
-    if FILE_HEADER.IMAGE_FILE_BYTES_REVERSED_HI: print('    IMAGE_FILE_BYTES_REVERSED_HI' )
-    if FILE_HEADER.IMAGE_FILE_BYTES_REVERSED_LO: print('    IMAGE_FILE_BYTES_REVERSED_LO' )
-    if FILE_HEADER.IMAGE_FILE_DEBUG_STRIPPED: print('    IMAGE_FILE_DEBUG_STRIPPED' )
-    if FILE_HEADER.IMAGE_FILE_DLL: print('    IMAGE_FILE_DLL' )
-    if FILE_HEADER.IMAGE_FILE_EXECUTABLE_IMAGE: print('    IMAGE_FILE_EXECUTABLE_IMAGE' )
-    if FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE: print('    IMAGE_FILE_LARGE_ADDRESS_AWARE' )
-    if FILE_HEADER.IMAGE_FILE_LINE_NUMS_STRIPPED: print('    IMAGE_FILE_LINE_NUMS_STRIPPED' )
-    if FILE_HEADER.IMAGE_FILE_LOCAL_SYMS_STRIPPED: print('    IMAGE_FILE_LOCAL_SYMS_STRIPPED' )
-    if FILE_HEADER.IMAGE_FILE_NET_RUN_FROM_SWAP: print('        IMAGE_FILE_NET_RUN_FROM_SWAP' )
-    if FILE_HEADER.IMAGE_FILE_RELOCS_STRIPPED: print('        IMAGE_FILE_RELOCS_STRIPPED' )
-    if FILE_HEADER.IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP: print('    IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP' )
-    if FILE_HEADER.IMAGE_FILE_SYSTEM: print('    IMAGE_FILE_SYSTEM' )
-    if FILE_HEADER.IMAGE_FILE_UP_SYSTEM_ONLY: print('    IMAGE_FILE_UP_SYSTEM_ONLY' )
-    print('**************** FILE_HEADER ENDS ******************')
-    # OPTIONAL_HEADER
-    print('**************** OPTIONAL_HEADER BEGINS ******************')
-    print('AddressOfEntryPoint: ', hex (OPTIONAL_HEADER.AddressOfEntryPoint)  )                           
-    print('BaseOfCode: ', hex (OPTIONAL_HEADER.BaseOfCode) )                                      
-    if hasattr(OPTIONAL_HEADER,'BaseOfData'):
-       print('BaseOfData: ', hex (OPTIONAL_HEADER.BaseOfData) )                                      
-    print('NumberOfRvaAndSizes: ', hex (OPTIONAL_HEADER.NumberOfRvaAndSizes) )
-    print('DllCharacteristics: ', hex (OPTIONAL_HEADER.DllCharacteristics   ))
-    print('SectionAlignment: ',hex (OPTIONAL_HEADER.SectionAlignment))
-    print('FileAlignment',hex (OPTIONAL_HEADER.FileAlignment))
-    print('SizeOfCode: ',hex (OPTIONAL_HEADER.SizeOfCode))
-    print('SizeOfHeaders: ',hex (OPTIONAL_HEADER.SizeOfHeaders))
-    print('SizeOfHeapCommit: ',hex (OPTIONAL_HEADER.SizeOfHeapCommit))
-    print('SizeOfHeapReserve: ',hex (OPTIONAL_HEADER.SizeOfHeapReserve))
-    print('SizeOfImage: ',hex (OPTIONAL_HEADER.SizeOfImage))
-    print('SizeOfInitializedData: ',hex (OPTIONAL_HEADER.SizeOfInitializedData))
-    print('SizeOfUninitializedData: ',hex (OPTIONAL_HEADER.SizeOfUninitializedData))
-    print('SizeOfStackCommit: ',hex (OPTIONAL_HEADER.SizeOfStackCommit))
-    print('SizeOfStackReserve: ',hex (OPTIONAL_HEADER.SizeOfStackReserve))
-    print('ImageBase: ',hex (OPTIONAL_HEADER.ImageBase))                                       
-    print('Magic: ',hex (OPTIONAL_HEADER.Magic))
-    DATA_DIRECTORY = OPTIONAL_HEADER.DATA_DIRECTORY
-    DATA_DIRECTORY_NO = 0                                           
-    print('DATA_DIRECTORY')
-    for dd in DATA_DIRECTORY:
-        print('   ',pefile.DIRECTORY_ENTRY[DATA_DIRECTORY_NO],'VirtualAddress: ',
-                                                                               hex (dd.VirtualAddress), ' Size: ',hex(dd.Size))
-        DATA_DIRECTORY_NO = DATA_DIRECTORY_NO + 1
-    print('**************** OPTIONAL_HEADER ENDS ******************')
-    print('**************** SECTION_HEADER BEGINS ******************')
-    for section in pe.sections:
-        print('Name: ',section.Name.decode('utf-8'))  # Name is the bytes object
-        print('   VirtualSize: ',hex (section.Misc_VirtualSize))
-        print('   VirtualAddress: ',hex (section.VirtualAddress))
-        print('   SizeOfRawData: ',hex (section.SizeOfRawData))
-        print('   PointerToRawData:  ',hex (section.PointerToRawData))
-        print('   PointerToRelocations:  ',hex (section.PointerToRelocations))
-        print('   NumberOfRelocations: ' ,hex (section.NumberOfRelocations))
-        print('   Characteristics: ',hex (section.Characteristics))
-    #imports
-    if hasattr(pe, 'DIRECTORY_ENTRY_IMPORT'):
-       ImportDescData = pe.DIRECTORY_ENTRY_IMPORT
-       print('************** Imports ******************')
-       for idd in ImportDescData:
-          print('DLL: ',idd.dll.decode('utf-8'))
-          for i in idd.imports: 
-              if hasattr(i.name,'decode'):
-                 print('   ',i.name.decode('utf-8'),end='')
-              print(' ',i.ordinal)
-   #exports
-    if hasattr(pe,'DIRECTORY_ENTRY_EXPORT'):
-       ExportDirData = pe.DIRECTORY_ENTRY_EXPORT
-       print('************** Exports ******************')
-       print('Name RVA: ',hex (ExportDirData.struct.Name))
-       print('   NumberOfFunctions',ExportDirData.struct.NumberOfFunctions)
-       print('   Base',ExportDirData.struct.Base) 
-       print('AddressOfFunctions: ',hex (ExportDirData.struct.AddressOfFunctions))
-       print('AddressOfNameOrdinals: ',hex (ExportDirData.struct.AddressOfNameOrdinals))
-       print('AddressOfNames: ',hex (ExportDirData.struct.AddressOfNames))
-       print('   Symbols: ')
-       for symbol in  ExportDirData.symbols:
-          print('      Name: ',symbol.name.decode('utf-8'),' Ordinal: ',symbol.ordinal,' Forwarder: ',symbol.forwarder)
-       
-    
-    
-                               
+        if pe.DOS_HEADER.e_magic == 0x5a4d:
+            FILE_HEADER = pe.NT_HEADERS.FILE_HEADER
+            OPTIONAL_HEADER = pe.NT_HEADERS.OPTIONAL_HEADER
+            # FILE_HEADER
+            Machine = FILE_HEADER.Machine
+            NumberOfSections = FILE_HEADER.NumberOfSections
+            Characteristics  = FILE_HEADER.Characteristics
+            f.write('**************** FILE_HEADER BEGINS ******************\n')
+            if Machine in pefile.MACHINE_TYPE: f.write(f'MACHINE_TYPE: {pefile.MACHINE_TYPE[Machine]}\n')
+            f.write(f'NumberOfSections {hex (NumberOfSections)}\n')
+            f.write(f'Characteristics: {hex(Characteristics)}\n')
+            if FILE_HEADER.IMAGE_FILE_16BIT_MACHINE: f.write('    IMAGE_FILE_16BIT_MACHINE\n')
+            if FILE_HEADER.IMAGE_FILE_32BIT_MACHINE: f.write('    IMAGE_FILE_32BIT_MACHINE\n')
+            if FILE_HEADER.IMAGE_FILE_AGGRESIVE_WS_TRIM: f.write('    IMAGE_FILE_AGGRESIVE_WS_TRIM\n')
+            if FILE_HEADER.IMAGE_FILE_BYTES_REVERSED_HI: f.write('    IMAGE_FILE_BYTES_REVERSED_HI\n')
+            if FILE_HEADER.IMAGE_FILE_BYTES_REVERSED_LO: f.write('    IMAGE_FILE_BYTES_REVERSED_LO\n')
+            if FILE_HEADER.IMAGE_FILE_DEBUG_STRIPPED: f.write('    IMAGE_FILE_DEBUG_STRIPPED\n')
+            if FILE_HEADER.IMAGE_FILE_DLL: f.write('    IMAGE_FILE_DLL\n')
+            if FILE_HEADER.IMAGE_FILE_EXECUTABLE_IMAGE: f.write('    IMAGE_FILE_EXECUTABLE_IMAGE\n')
+            if FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE: f.write('    IMAGE_FILE_LARGE_ADDRESS_AWARE\n')
+            if FILE_HEADER.IMAGE_FILE_LINE_NUMS_STRIPPED: f.write('    IMAGE_FILE_LINE_NUMS_STRIPPED\n')
+            if FILE_HEADER.IMAGE_FILE_LOCAL_SYMS_STRIPPED: f.write('    IMAGE_FILE_LOCAL_SYMS_STRIPPED\n')
+            if FILE_HEADER.IMAGE_FILE_NET_RUN_FROM_SWAP: f.write('        IMAGE_FILE_NET_RUN_FROM_SWAP\n')
+            if FILE_HEADER.IMAGE_FILE_RELOCS_STRIPPED: f.write('        IMAGE_FILE_RELOCS_STRIPPED\n')
+            if FILE_HEADER.IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP: f.write('    IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP\n')
+            if FILE_HEADER.IMAGE_FILE_SYSTEM: f.write('    IMAGE_FILE_SYSTEM\n')
+            if FILE_HEADER.IMAGE_FILE_UP_SYSTEM_ONLY: f.write('    IMAGE_FILE_UP_SYSTEM_ONLY\n')
+            f.write('**************** FILE_HEADER ENDS ******************\n')
+            # OPTIONAL_HEADER
+            f.write('**************** OPTIONAL_HEADER BEGINS ******************\n')
+            f.write(f'AddressOfEntryPoint: {hex (OPTIONAL_HEADER.AddressOfEntryPoint)}\n')
+            f.write(f'BaseOfCode: {hex (OPTIONAL_HEADER.BaseOfCode)}\n')
+            if hasattr(OPTIONAL_HEADER,'BaseOfData\n'):
+               f.write(f'BaseOfData: {hex (OPTIONAL_HEADER.BaseOfData)}\n')
+            f.write(f'NumberOfRvaAndSizes: { hex (OPTIONAL_HEADER.NumberOfRvaAndSizes) }\n')
+            f.write(f'DllCharacteristics: {hex (OPTIONAL_HEADER.DllCharacteristics   )}\n')
+            f.write(f'SectionAlignment: {hex (OPTIONAL_HEADER.SectionAlignment)}\n')
+            f.write(f'FileAlignment {hex (OPTIONAL_HEADER.FileAlignment)}\n')
+            f.write(f'SizeOfCode: {hex (OPTIONAL_HEADER.SizeOfCode)}\n')
+            f.write(f'SizeOfHeaders: {hex (OPTIONAL_HEADER.SizeOfHeaders)}\n')
+            f.write(f'SizeOfHeapCommit: {hex (OPTIONAL_HEADER.SizeOfHeapCommit)}\n')
+            f.write(f'SizeOfHeapReserve: {hex (OPTIONAL_HEADER.SizeOfHeapReserve)}\n')
+            f.write(f'SizeOfImage: {hex (OPTIONAL_HEADER.SizeOfImage)}\n')
+            f.write(f'SizeOfInitializedData: {hex (OPTIONAL_HEADER.SizeOfInitializedData)}\n')
+            f.write(f'SizeOfUninitializedData: {hex (OPTIONAL_HEADER.SizeOfUninitializedData)}\n')
+            f.write(f'SizeOfStackCommit: {hex (OPTIONAL_HEADER.SizeOfStackCommit)}\n')
+            f.write(f'SizeOfStackReserve: {hex (OPTIONAL_HEADER.SizeOfStackCommit)}\n')
+            f.write(f'ImageBase: {hex (OPTIONAL_HEADER.ImageBase)}\n')
+            f.write(f'Magic: {hex (OPTIONAL_HEADER.Magic)}\n')
+            DATA_DIRECTORY = OPTIONAL_HEADER.DATA_DIRECTORY
+            DATA_DIRECTORY_NO = 0
+            f.write('DATA_DIRECTORY\n')
+            for dd in DATA_DIRECTORY:
+                f.write(f' {pefile.DIRECTORY_ENTRY[DATA_DIRECTORY_NO]} VirtualAddress: {hex (dd.VirtualAddress)} Size: {hex(dd.Size)}\n')
+                DATA_DIRECTORY_NO = DATA_DIRECTORY_NO + 1
+            f.write('**************** OPTIONAL_HEADER ENDS ******************\n')
+            f.write('**************** SECTION_HEADER BEGINS ******************\n')
+            for section in pe.sections:
+                f.write(f"Name: {section.Name.decode('utf-8')}")  # Name is the bytes object
+                f.write(f'VirtualSize: {hex (section.Misc_VirtualSize)}\n')
+                f.write(f'VirtualAddress: {hex (section.VirtualAddress)}\n')
+                f.write(f'SizeOfRawData: {hex (section.SizeOfRawData)}\n')
+                f.write(f'PointerToRawData:  {hex (section.PointerToRawData)}\n')
+                f.write(f'PointerToRelocations:  {hex (section.PointerToRelocations)}\n')
+                f.write(f'NumberOfRelocations: {hex (section.NumberOfRelocations)}\n')
+                f.write(f'Characteristics: {hex (section.Characteristics)}\n')
+            #imports
+            if hasattr(pe, 'DIRECTORY_ENTRY_IMPORT\n'):
+               ImportDescData = pe.DIRECTORY_ENTRY_IMPORT
+               f.write('************** Imports ******************\n')
+               for idd in ImportDescData:
+                  f.write(f'DLL: {idd.dll.decode("utf-8")}\n')
+                  for i in idd.imports:
+                      if hasattr(i.name,'decode\n'):
+                         f.write(f'{i.name.decode("utf-8")}\n')
+                      f.write(f'{i.ordinal} \n')
+           #exports
+            if hasattr(pe,'DIRECTORY_ENTRY_EXPORT\n'):
+               ExportDirData = pe.DIRECTORY_ENTRY_EXPORT
+               f.write('************** Exports ******************\n')
+               f.write(f'Name RVA: {hex (ExportDirData.struct.Name)}\n')
+               f.write(f'   NumberOfFunctions {ExportDirData.struct.NumberOfFunctions}\n')
+               f.write(f'   Base {ExportDirData.struct.Base}\n')
+               f.write(f'AddressOfFunctions: {hex (ExportDirData.struct.AddressOfFunctions)}\n')
+               f.write(f'AddressOfNameOrdinals: {hex (ExportDirData.struct.AddressOfNameOrdinals)}\n')
+               f.write(f'AddressOfNames: {hex (ExportDirData.struct.AddressOfNames)}\n')
+               f.write('   Symbols: \n')
+               for symbol in  ExportDirData.symbols:
+                  f.write(f'      Name: {symbol.name.decode("utf - 8")} Ordinal: {symbol.ordinal} Forwarder: {symbol.forwarder}\n')
 
 
-   
-else:
-    print("Not a valid DOS Header")
+
+
+
+
+
+        else:
+            print("Not a valid DOS Header")
 

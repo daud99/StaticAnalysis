@@ -35,18 +35,18 @@ class FileExtractor():
                 yield each
 
 def showHelp():
-    print("Usage: mains [option(s)] [path]\n"
+    print("Usage: analysis.py [option(s)] [path]\n"
           "Calculate hashes, find strings, file types and extract useful different PE file formatsThe options are:\n"
           "The options are:\n"
           "\t--file\t\t\t\t\tSpecify that given path is the path of single file\n"
           "\t--folder\t\t\t\tSpecify that given path is the path of folder containing files\n"
-          "\t--csv[default=False]\t\t\t\tExporting csv file\n"
-          "\t--display[default=True]\t\t\t\tDisplay the findings\n"
+          "\t--csv[default=False]\t\t\tExporting csv file\n"
+          "\t--display[default=True]\t\t\tDisplay the findings\n"
           "\t--csv-name\t\t\t\tSpecify the name of exporting csv file\n"
           "\t--csv-path[default=pwd]\t\t\tSpecify the path where to store the resultant csv file\n"
           "\t--string-file-path[default=pwd]\t\tSpecify the path where to store the resultant string files\n"
           "\t--discover-file-path[default=pwd]\tSpecify the path where to store the resultant discover_pe files\n"
-          "Either --file or --folder can be use both can't be used at the same time.\n"
+          "Either --file or --folder can be use one at a time. Both can't be used at the same time.\n"
           "Report bugs to: daudahmed@zoho.com")
 
 if "__main__" == __name__:

@@ -7,9 +7,13 @@ pip install virtualenv
 ```
 2. Create Virtualenv
 ```shell
+virtualenv venv
+```
+3. Activate Virtualenv
+```shell
 source venv/bin/activate
 ```
-3. Install Dependencies
+4. Install Dependencies
 ```shell
 pip install -r requirements.txt
 ```
